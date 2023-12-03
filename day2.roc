@@ -24,7 +24,7 @@ part1 = \data ->
     |> Str.split "\n"
     |> List.dropIf Str.isEmpty
     |> List.map \line ->
-        {before, after} = Str.splitFirst line ":" |> unwrap
+        { before, after } = Str.splitFirst line ":" |> unwrap
         valid = lineValid after
         if valid then
             before
@@ -37,10 +37,10 @@ part1 = \data ->
             0
     |> List.sum
 
-lineValid = \after->
+lineValid = \after ->
     set <- Str.split after ";" |> List.all
     cubes <- set |> Str.trim |> Str.split "," |> List.all
-    {before: countStr, after: color} =
+    { before: countStr, after: color } =
         cubes
         |> Str.trim
         |> Str.splitFirst " "
@@ -53,7 +53,6 @@ lineValid = \after->
         "blue" -> count <= 14
         _ -> crash "invalid color: \(color)"
 
-
 expect
     res = part2 p2Sample
     res == 2286
@@ -64,17 +63,17 @@ part2 = \data ->
     |> Str.split "\n"
     |> List.dropIf Str.isEmpty
     |> List.map \line ->
-        {after} = Str.splitFirst line ":" |> unwrap
+        { after } = Str.splitFirst line ":" |> unwrap
         Str.split after ";"
         |> List.map counts
         |> List.join
-        |> List.walk {r: 0, b: 0, g: 0} \old, new -> {r: Num.max old.r new.r, g: Num.max old.g new.g, b: Num.max old.b new.b}
-    |> List.map \{r, g, b} -> r * g * b
+        |> List.walk { r: 0, b: 0, g: 0 } \old, new -> { r: Num.max old.r new.r, g: Num.max old.g new.g, b: Num.max old.b new.b }
+    |> List.map \{ r, g, b } -> r * g * b
     |> List.sum
 
 counts = \set ->
     cubes <- set |> Str.trim |> Str.split "," |> List.map
-    {before: countStr, after: color} =
+    { before: countStr, after: color } =
         cubes
         |> Str.trim
         |> Str.splitFirst " "
@@ -82,9 +81,9 @@ counts = \set ->
 
     count = Str.toU32 countStr |> unwrap
     when color is
-        "red" -> {r: count, g: 0, b: 0}
-        "green" -> {r: 0, g: count, b: 0}
-        "blue" -> {r: 0, g: 0, b: count}
+        "red" -> { r: count, g: 0, b: 0 }
+        "green" -> { r: 0, g: count, b: 0 }
+        "blue" -> { r: 0, g: 0, b: count }
         _ -> crash "invalid color: \(color)"
 
 unwrap = \res ->

@@ -21,8 +21,8 @@ expect
 part1 : Str -> U32
 part1 = \str ->
     data =
-        str 
-        |> Str.toUtf8 
+        str
+        |> Str.toUtf8
         |> List.dropIf \x -> x == '\n'
 
     size =
@@ -35,36 +35,38 @@ part1 = \str ->
 
     loadNum = \start, end ->
         data
-        |> List.sublist {start, len: end - start + 1}
+        |> List.sublist { start, len: end - start + 1 }
         |> List.map \x -> x - '0'
         |> List.walk 0 \accum, x -> accum * 10 + (Num.toU32 x)
 
     data
-    |> List.walkWithIndex {start: None, nums: []} \{start, nums}, val, i ->
+    |> List.walkWithIndex { start: None, nums: [] } \{ start, nums }, val, i ->
         digit = isDigit val
         when start is
             None ->
                 if digit then
-                    {start: Index i, nums}
+                    { start: Index i, nums }
                 else
-                    {start: None, nums}
+                    { start: None, nums }
+
             Index index ->
                 if !digit then
-                    end = i - 1 
+                    end = i - 1
                     num = loadNum index end
-                    {start: None, nums: List.append nums {start: index, end, num}}
+                    { start: None, nums: List.append nums { start: index, end, num } }
                 else
-                    {start: start, nums}
-    |> \{start, nums} ->
+                    { start: start, nums }
+    |> \{ start, nums } ->
         # handle edge case of number at end.
         when start is
             Index index ->
                 end = (List.len data) - 1
                 num = loadNum index end
-                List.append nums {start: index, end, num}
+                List.append nums { start: index, end, num }
+
             _ ->
                 nums
-    |> List.map \{start, end, num} ->
+    |> List.map \{ start, end, num } ->
         startRow = (start // size) |> Num.toI32
         startCol = (start % size) |> Num.toI32
 
@@ -80,23 +82,22 @@ part1 = \str ->
             Num.min (endCol + 1) (sizeI32 - 1),
         )
         { touchingStart, touchingEnd, num }
-    |> List.keepIf \{touchingStart, touchingEnd} ->
+    |> List.keepIf \{ touchingStart, touchingEnd } ->
         containsSymbol data sizeI32 touchingStart touchingEnd
     |> List.map .num
     |> List.sum
 
-
 containsSymbol = \data, size, (startRow, startCol), (endRow, endCol) ->
-    List.range {start: At startRow, end: At endRow }
+    List.range { start: At startRow, end: At endRow }
     |> List.map \row ->
-        List.range {start: At startCol, end: At endCol }
+        List.range { start: At startCol, end: At endCol }
         |> List.map \col ->
             index = Num.toNat (row * size + col)
             sym = List.get data index |> unwrap
             sym
     |> List.join
     |> List.any validSymbol
-               
+
 validSymbol = \x ->
     !(isDigit x) && x != '.'
 
@@ -107,8 +108,8 @@ expect
 part2 : Str -> U32
 part2 = \str ->
     data =
-        str 
-        |> Str.toUtf8 
+        str
+        |> Str.toUtf8
         |> List.dropIf \x -> x == '\n'
 
     size =
@@ -121,36 +122,38 @@ part2 = \str ->
 
     loadNum = \start, end ->
         data
-        |> List.sublist {start, len: end - start + 1}
+        |> List.sublist { start, len: end - start + 1 }
         |> List.map \x -> x - '0'
         |> List.walk 0 \accum, x -> accum * 10 + (Num.toU32 x)
 
     data
-    |> List.walkWithIndex {start: None, nums: []} \{start, nums}, val, i ->
+    |> List.walkWithIndex { start: None, nums: [] } \{ start, nums }, val, i ->
         digit = isDigit val
         when start is
             None ->
                 if digit then
-                    {start: Index i, nums}
+                    { start: Index i, nums }
                 else
-                    {start: None, nums}
+                    { start: None, nums }
+
             Index index ->
                 if !digit then
-                    end = i - 1 
+                    end = i - 1
                     num = loadNum index end
-                    {start: None, nums: List.append nums {start: index, end, num}}
+                    { start: None, nums: List.append nums { start: index, end, num } }
                 else
-                    {start: start, nums}
-    |> \{start, nums} ->
+                    { start: start, nums }
+    |> \{ start, nums } ->
         # handle edge case of number at end.
         when start is
             Index index ->
                 end = (List.len data) - 1
                 num = loadNum index end
-                List.append nums {start: index, end, num}
+                List.append nums { start: index, end, num }
+
             _ ->
                 nums
-    |> List.map \{start, end, num} ->
+    |> List.map \{ start, end, num } ->
         startRow = (start // size) |> Num.toI32
         startCol = (start % size) |> Num.toI32
 
@@ -166,14 +169,15 @@ part2 = \str ->
             Num.min (endCol + 1) (sizeI32 - 1),
         )
         { touchingStart, touchingEnd, num }
-    |> List.map \{touchingStart, touchingEnd, num} ->
+    |> List.map \{ touchingStart, touchingEnd, num } ->
         gears = touchingGears data sizeI32 touchingStart touchingEnd
-        {num, gears}
-    |> List.walk (Dict.empty {}) \dict, {gears, num} ->
+        { num, gears }
+    |> List.walk (Dict.empty {}) \dict, { gears, num } ->
         List.walk gears dict \innerDict, gear ->
             when Dict.get innerDict gear is
                 Ok nums ->
                     Dict.insert innerDict gear (List.append nums num)
+
                 Err _ ->
                     Dict.insert innerDict gear [num]
     |> Dict.values
@@ -182,15 +186,15 @@ part2 = \str ->
     |> List.sum
 
 touchingGears = \data, size, (startRow, startCol), (endRow, endCol) ->
-    List.range {start: At startRow, end: At endRow }
+    List.range { start: At startRow, end: At endRow }
     |> List.map \row ->
-        List.range {start: At startCol, end: At endCol }
+        List.range { start: At startCol, end: At endCol }
         |> List.map \col ->
             index = Num.toNat (row * size + col)
             sym = List.get data index |> unwrap
-            {sym, index}
+            { sym, index }
     |> List.join
-    |> List.keepIf \{sym} -> sym == '*'
+    |> List.keepIf \{ sym } -> sym == '*'
     |> List.map .index
 
 isDigit = \x ->
