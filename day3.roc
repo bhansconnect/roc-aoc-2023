@@ -15,7 +15,18 @@ main =
     Stdout.line "\(Num.toStr p1)\n\(Num.toStr p2)"
 
 expect
+    out = fn 7i32 8i32
+    out == [7, 8]
+    
+fn = \startRow, endRow ->
+    List.range { start: At startRow, end: At endRow }
+    |> List.map \row ->
+        dbg row
+        row
+
+expect
     res = part1 p1Sample
+    dbg (part1 p1Sample)
     res == 4361
 
 part1 : Str -> U32
