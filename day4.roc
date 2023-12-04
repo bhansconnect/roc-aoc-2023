@@ -31,13 +31,12 @@ parse = \str ->
     |> Str.split "\n"
     |> List.dropIf Str.isEmpty
     |> List.map \line ->
-        {before: card, after: winning} = Str.splitFirst line "|" |> unwrap
-        {after: cardNumbers} = Str.splitFirst card ":" |> unwrap
+        { before: card, after: winning } = Str.splitFirst line "|" |> unwrap
+        { after: cardNumbers } = Str.splitFirst card ":" |> unwrap
 
         Set.intersection (parseStrNums cardNumbers) (parseStrNums winning)
         |> Set.len
         |> Num.toU8
-
 
 parseStrNums = \str ->
     str
@@ -59,15 +58,12 @@ part2 = \str ->
 
     List.walkWithIndex counts (List.repeat 1 len) \copies, count, baseIndex ->
         copy = List.get copies baseIndex |> unwrap
-        List.range {start: At (baseIndex + 1), end: Length (Num.toNat count)}
+        List.range { start: At (baseIndex + 1), end: Length (Num.toNat count) }
         |> List.walk copies \state, i ->
-            List.update state i \x -> x + copy 
+            List.update state i \x -> x + copy
     |> List.sum
-        
 
 unwrap = \res ->
     when res is
         Ok x -> x
-        Err _ ->
-            dbg res
-            crash "bad unwrap"
+        Err _ -> crash "bad unwrap"
